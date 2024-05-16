@@ -1,4 +1,3 @@
-
 Overview:
 This mini-project demonstrates the implementation of microservices architecture using Node.js, gRPC, MongoDB, Kafka, and GraphQL. 
 The project consists of an API Gateway, episode microservice, and video microservice, each serving different functionalities related to episodes and videos.
@@ -43,6 +42,7 @@ Defines the GraphQL schema for episodes and videos.
 Specifies the structure of queries and mutations available to clients.
 
 Data Schema:
+     
      Episode Schema:
 	_id: Unique identifier for episodes.
 	title: Title of the episode.
