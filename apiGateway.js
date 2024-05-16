@@ -1,114 +1,150 @@
 // apiGateway.js
+const mongoose = require('mongoose');
 const express = require('express');
+const { ApolloServer } = require('@apollo/server');
+const { expressMiddleware } = require('@apollo/server/express4');
 const bodyParser = require('body-parser');
-const { ApolloServer } = require('apollo-server-express');
-const { graphqlHTTP } = require('express-graphql');
+const cors = require('cors');
 const grpc = require('@grpc/grpc-js');
 const protoLoader = require('@grpc/proto-loader');
-const mongoose = require('mongoose');
 
-// MongoDB Movie model
-const Movie = require('./models/Movie');
+// Charger les fichiers proto pour les films et les séries TV
+const episodeProtoPath = 'episode.proto';
+const videoProtoPath = 'video.proto';
 
-// Load GraphQL type definitions
+const resolvers = require('./resolvers');
 const typeDefs = require('./schema');
 
-// Load GraphQL resolvers
-const resolvers = require('./resolvers');
-
-// Load gRPC proto definitions
-const movieProtoPath = 'movie.proto';
-const movieProtoDefinition = protoLoader.loadSync(movieProtoPath, {
+// Créer une nouvelle application Express
+const app = express();
+const episodeProtoDefinition = protoLoader.loadSync(episodeProtoPath, {
     keepCase: true,
     longs: String,
     enums: String,
     defaults: true,
     oneofs: true,
 });
-const movieProto = grpc.loadPackageDefinition(movieProtoDefinition).movie;
-
-// Create Express app
-const app = express();
-app.use(bodyParser.json());
+const videoProtoDefinition = protoLoader.loadSync(videoProtoPath, {
+    keepCase: true,
+    longs: String,
+    enums: String,
+    defaults: true,
+    oneofs: true,
+});
+const episodeProto = grpc.loadPackageDefinition(episodeProtoDefinition).episode;
+const videoProto = grpc.loadPackageDefinition(videoProtoDefinition).video;
 
 // Connect to MongoDB
 const connectToMongoDB = async () => {
     try {
-        await mongoose.connect('mongodb://localhost:27017/mydatabase', { useNewUrlParser: true, useUnifiedTopology: true });
+        await mongoose.connect('mongodb://localhost:27017/MiniProject', { useNewUrlParser: true, useUnifiedTopology: true });
         console.log('Connected to MongoDB');
     } catch (err) {
         console.error('Error connecting to MongoDB:', err);
     }
 };
 
-// REST endpoint for creating movies
-app.post('/movies', async (req, res) => {
-    try {
-        const { title, description } = req.body;
-   
-        const movie = new Movie({ title, description });
-        await movie.save();
-        res.status(201).json(movie);
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
+// Créer une instance ApolloServer avec le schéma et les résolveurs importés
+const server = new ApolloServer({ typeDefs, resolvers });
+// Appliquer le middleware ApolloServer à l'application Express
+server.start().then(() => {
+    app.use(
+        cors(),
+        bodyParser.json(),
+        expressMiddleware(server),
+    );
 });
-
-
-// GraphQL server setup
-const apolloServer = new ApolloServer({ typeDefs, resolvers });
-
-// Await server.start() before applying middleware
-const startApolloServer = async () => {
-    try {
-        await apolloServer.start();
-        apolloServer.applyMiddleware({ app });
-    } catch (err) {
-        console.error('Error starting Apollo Server:', err);
-    }
-};
-
-// gRPC client setup
-const movieClient = new movieProto.MovieService('localhost:50051', grpc.credentials.createInsecure());
-
-// REST endpoint for creating movies using gRPC
-app.post('/movies/grpc', (req, res) => {
-    const { title, description } = req.body;
-    movieClient.createMovie({ title, description }, (err, response) => {
+app.use(bodyParser.json());
+app.get('/episodes', (req, res) => {
+    const client = new episodeProto.episodeService('localhost:50051',
+        grpc.credentials.createInsecure());
+    client.searchepisodes({}, (err, response) => {
         if (err) {
-            res.status(500).json({ error: err.message });
+            res.status(500).send(err);
         } else {
-            res.status(201).json(response.movie);
+            res.json(response.episodes);
+        }
+    });
+});
+app.get('/episodes/:id', (req, res) => {
+    const client = new episodeProto.episodeService('localhost:50051',
+        grpc.credentials.createInsecure());
+    const _id = req.params.id;
+    client.getepisode({ episode_id: _id }, (err, response) => {
+        if (err) {
+            res.status(500).send(err);
+        } else {
+            res.json(response.episode);
         }
     });
 });
 
-// GraphQL endpoint for creating movies using gRPC
-app.use('/graphql/grpc', graphqlHTTP({
-    schema: typeDefs,
-    rootValue: resolvers,
-    graphiql: true,
-}));
+app.post('/episodes/create', (req, res) => {
+    const client = new episodeProto.episodeService('localhost:50051', grpc.credentials.createInsecure());
+    const { title, description } = req.body;
 
-// GraphQL endpoint for creating movies using gRPC
-app.use('/graphql/movies', graphqlHTTP({
-    schema: typeDefs,
-    rootValue: resolvers,
-    graphiql: true,
-}));
-
-
-const port = 3000;
-const startServer = async () => {
-    try {
-        await connectToMongoDB();
-        await startApolloServer();
-        app.listen(port, () => {
-            console.log(`API Gateway en cours d'exécution sur le port ${port}`);
-        });
-    } catch (err) {
-        console.error('Error starting server:', err);
+    // Check if title and description are present
+    if (!title || !description) {
+        return res.status(400).json({ error: 'Title and description are required' });
     }
-};
 
-startServer();
+    const request = { title, description };
+
+    client.createepisode(request, (err, response) => {
+        if (err) {
+            res.status(500).send(err);
+        } else {
+            res.json(response.episode);
+        }
+    });
+});
+
+app.get('/videos', (req, res) => {
+    const client = new videoProto.videoService('localhost:50052',
+        grpc.credentials.createInsecure());
+    client.searchvideos({}, (err, response) => {
+        if (err) {
+            res.status(500).send(err);
+        } else {
+            res.json(response.videos);
+        }
+    });
+});
+app.get('/videos/:id', (req, res) => {
+    const client = new videoProto.videoService('localhost:50052',
+        grpc.credentials.createInsecure());
+    const id = req.params.id;
+    client.getvideo({ videoId: id }, (err, response) => {
+        if (err) {
+            res.status(500).send(err);
+        } else {
+            res.json(response.video);
+        }
+    });
+});
+
+app.post('/episodes/create', (req, res) => {
+    const client = new videoProto.videoService('localhost:50052', grpc.credentials.createInsecure());
+    const { title, description } = req.body;
+
+    // Check if title and description are present
+    if (!title || !description) {
+        return res.status(400).json({ error: 'Title and description are required' });
+    }
+
+    const request = { title, description };
+
+    client.createepisode(request, (err, response) => {
+        if (err) {
+            res.status(500).send(err);
+        } else {
+            res.json(response.video);
+        }
+    });
+});
+// Démarrer l'application Express
+const port = 3000;
+app.listen(port, () => {
+    connectToMongoDB();
+    console.log(`API Gateway en cours d'exécution sur le port ${port}`);
+});

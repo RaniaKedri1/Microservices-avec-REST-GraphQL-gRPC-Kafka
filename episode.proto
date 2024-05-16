@@ -1,0 +1,42 @@
+syntax = "proto3";
+package episode;
+// Définition du message episode
+message episode {
+    string _id = 1;
+    string title = 2;
+    string description = 3;
+// Ajouter d'autres champs de données pour les films au besoin
+}
+// Définition des messages de requête et de réponse pour les méthodes d
+message GetepisodeRequest {
+    string episode_id = 1;
+}
+
+message GetepisodeResponse {
+    episode episode = 1;
+}
+
+message CreateepisodeRequest {
+    string title = 1;
+    string description = 2;
+}
+
+message CreateepisodeResponse {
+    episode episode = 1;
+}
+
+message SearchepisodesRequest {
+    string query = 1;
+}
+
+message SearchepisodesResponse {
+    repeated episode episodes = 1;
+}
+
+// Définition du service de films
+service episodeService {
+rpc Getepisode(GetepisodeRequest) returns (GetepisodeResponse);
+rpc Searchepisodes(SearchepisodesRequest) returns (SearchepisodesResponse);
+rpc Createepisode(CreateepisodeRequest) returns (CreateepisodeResponse) ;
+// Ajouter d'autres méthodes au besoin
+}
