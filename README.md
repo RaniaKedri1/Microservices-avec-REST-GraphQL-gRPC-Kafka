@@ -1,5 +1,6 @@
 Introduction:
-Welcome to the Microservices Demo Project! This project demonstrates the implementation of a microservices architecture using Node.js, gRPC, MongoDB, Kafka, and GraphQL.
+
+This project demonstrates the implementation of a microservices architecture using Node.js, gRPC, MongoDB, Kafka, and GraphQL.
 
 🔰 About:
 This project showcases how to create and manage episodes and videos using a microservices architecture. It leverages gRPC for inter-service communication and GraphQL for querying and mutating data.
@@ -85,15 +86,18 @@ mini-projet-microservice
 
 📄Data Schema:
 
-     Episode Schema:
-	_id: Unique identifier for episodes.
+Episode Schema:
+	
+ 	_id: Unique identifier for episodes.
 	title: Title of the episode.
 	description: Description of the episode.
  
-     Video Schema:
-	id: Unique identifier for videos.
+Video Schema:
+	
+ 	id: Unique identifier for videos.
 	title: Title of the video.
 	description: Description of the video.
+ 
 📄Interactions:
 API Gateway <-> Microservices
 Microservices <-> MongoDB
