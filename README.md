@@ -1,40 +1,87 @@
-Overview:👨‍💻
-This mini-project demonstrates the implementation of microservices architecture using Node.js, gRPC, MongoDB , Kafka, and GraphQL. 
-The project consists of an API Gateway, episode microservice, and video microservice, each serving different functionalities related to episodes and videos.
+Introduction:
+Welcome to the Microservices Demo Project! This project demonstrates the implementation of a microservices architecture using Node.js, gRPC, MongoDB, Kafka, and GraphQL.
 
-📄Components:
-1.API Gateway (apiGateway.js):
-Responsible for routing requests to the appropriate microservices.
-Utilizes Express.js and Apollo Server for handling GraphQL requests.
-Communicates with the episode microservice and video microservice via gRPC for CRUD operations.
-Connects to MongoDB to store and retrieve data.
+🔰 About:
+This project showcases how to create and manage episodes and videos using a microservices architecture. It leverages gRPC for inter-service communication and GraphQL for querying and mutating data.
 
-2.Episode Microservice (episodeMicroservice.js):
-Implements gRPC server for episode-related operations.
-Defines gRPC methods to get, search, and create episodes.
-Uses MongoDB to store episode data.
-Integrates with Kafka for message consumption and production.
+⚡ Usage:
+Instructions on how to use the Microservices Demo Project.
 
-3.Video Microservice (videoMicroservice.js):
-Similar to the episode microservice, but deals with video-related operations.
-Implements gRPC server for video-related operations.
-Defines gRPC methods to get, search, and create videos.
-Utilizes MongoDB to store video data.
-Integrates with Kafka for message consumption and production.
+🔌 Installation:
+To install and set up the project, follow these steps:
 
-4.Resolvers (resolvers.js):
-Contains resolver functions for GraphQL queries and mutations.
-Utilizes gRPC clients to communicate with the episode and video microservices.
-Maps GraphQL queries to gRPC service methods for fetching data.
+Clone the repository:
 
-5.Kafka Helper (kafkaHelper.js):
-Provides functionality to interact with Kafka.
-Configures Kafka producer and consumer for sending and receiving messages.
-Used by episode and video microservices for asynchronous message processing.
+	https://github.com/RaniaKedri1/Project_Microservices.git
+ 
+Set up Kafka and Zookeeper:
+1.Create Kafka topics:
 
-6.GraphQL Schema (schema.js):
-Defines the GraphQL schema for episodes and videos.
-Specifies the structure of queries and mutations available to clients.
+	.\bin\kafka-topics.sh --create --partitions 1 --replication-factor 1 --topic movies-topic --bootstrap-server localhost:9092
+	.\bin\kafka-topics.sh --create --partitions 1 --replication-factor 1 --topic tvshows-topic --bootstrap-server localhost:9092
+ 
+2.Start Zookeeper:
+Open Command Prompt as Administrator.
+Navigate to the Kafka directory and start Zookeeper:
+
+ 	cd C:\kafka
+	.\bin\windows\zookeeper-server-start.bat config\zookeeper.properties
+
+3.Start Kafka:
+Open a new Command Prompt session as Administrator.
+Navigate to the Kafka directory and start Kafka:
+	
+ 	cd C:\kafka
+	.\bin\windows\kafka-server-start.bat config\server.properties
+
+
+📦 Commands
+To start the services, run the following commands:
+Start the API Gateway:
+
+	nodemon apiGateway.js
+ 
+ Start the Episode Microservice:
+ 
+ 	nodemon episodeMicroservice.js
+  
+  Start the Video Microservice:
+
+  	nodemon videoMicroservice.js
+
+🔧 Development
+Guidelines for contributing to the Microservices Demo Project.
+
+📓 Pre-Requisites
+	Node.js (v14 or higher)
+	npm (v6 or higher)
+	MongoDB
+	gRPC
+Ensure MongoDB is running.
+📁 File Structure
+The basic file structure is as follows:
+
+mini-projet-microservice
+
+	├── api
+	│   ├── apiGateway.js
+	│   ├── resolvers.js
+	├── database
+	│   └── db.js
+	├── models
+	│   ├── episodeModel.js
+	│   ├── videoModel.js
+	├── proto
+	│   ├── episode.proto
+	│   ├── video.proto
+	├── services
+	│   ├── episodeMicroservice.js
+	│   ├── videoMicroservice.js
+	├── kafkaHelper.js
+	├── schema.js
+	├── package.json
+	├── package-lock.json
+	└── README.md
 
 📄Data Schema:
 
@@ -47,15 +94,7 @@ Specifies the structure of queries and mutations available to clients.
 	id: Unique identifier for videos.
 	title: Title of the video.
 	description: Description of the video.
- 
 📄Interactions:
-API Gateway <-> Microservices:
-API Gateway routes requests to the appropriate microservice based on the request URL.
-Utilizes gRPC for communication between API Gateway and microservices.
-
-Microservices <-> MongoDB:
-Microservices interact with MongoDB for storing and retrieving episode and video data.
-
-Microservices <-> Kafka:
-Microservices integrate with Kafka for asynchronous message processing.
-Kafka is used for message production and consumption within microservices.
+API Gateway <-> Microservices
+Microservices <-> MongoDB
+Microservices <-> Kafka
