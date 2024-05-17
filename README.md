@@ -1,14 +1,17 @@
-Introduction:
+👨‍💻 Introduction:
 
 This project demonstrates the implementation of a microservices architecture using Node.js, gRPC, MongoDB, Kafka, and GraphQL.
 
 🔰 About:
+
 This project showcases how to create and manage episodes and videos using a microservices architecture. It leverages gRPC for inter-service communication and GraphQL for querying and mutating data.
 
 ⚡ Usage:
+
 Instructions on how to use the Microservices Demo Project.
 
 🔌 Installation:
+
 To install and set up the project, follow these steps:
 
 Clone the repository:
@@ -36,7 +39,8 @@ Navigate to the Kafka directory and start Kafka:
 	.\bin\windows\kafka-server-start.bat config\server.properties
 
 
-📦 Commands
+📦 Commands:
+
 To start the services, run the following commands:
 Start the API Gateway:
 
@@ -51,6 +55,7 @@ Start the API Gateway:
   	nodemon videoMicroservice.js
 
 🔧 Development
+
 Guidelines for contributing to the Microservices Demo Project.
 
 📓 Pre-Requisites
@@ -59,7 +64,9 @@ Guidelines for contributing to the Microservices Demo Project.
 	MongoDB
 	gRPC
 Ensure MongoDB is running.
+
 📁 File Structure
+
 The basic file structure is as follows:
 
 mini-projet-microservice
@@ -99,6 +106,7 @@ Video Schema:
 	description: Description of the video.
  
 📄Interactions:
+
 API Gateway <-> Microservices
 Microservices <-> MongoDB
 Microservices <-> Kafka
