@@ -108,5 +108,7 @@ Video Schema:
 📄Interactions:
 
 API Gateway <-> Microservices
+
 Microservices <-> MongoDB
+
 Microservices <-> Kafka
